@@ -9,21 +9,23 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-require('dotenv').config();
+require("dotenv").config();
+const get_token_from_llm_1 = require("./get-token-from-llm");
 const get_tweets_1 = require("./get-tweets");
+const web3_js_1 = require("@solana/web3.js");
+const swap_1 = require("./swap");
+const SOL_AMOUNT = 0.001 * web3_js_1.LAMPORTS_PER_SOL;
 function main(userName) {
     return __awaiter(this, void 0, void 0, function* () {
         const newTweets = yield (0, get_tweets_1.getTweets)(userName);
         console.log(newTweets);
-        // for(tweet of newTweets) {
-        //     const tokenAddress = await getTokenFromLLM(tweet.contents);
-        //     if(tokenAddress) {
-        //         const txn = await createSwapInstruction();
-        //         for(let i=0; i<SPAM_COUNT; i++){
-        //             sendTxn(txn);
-        //         }
-        //     }
-        // }
+        for (let tweet of newTweets) {
+            const tokenAddress = yield (0, get_token_from_llm_1.getTokenFromLLM)(tweet.contents);
+            if (tokenAddress !== "null") {
+                console.log(`trying to execute tweet => ${tweet.contents}`);
+                yield (0, swap_1.swap)(tokenAddress, SOL_AMOUNT);
+            }
+        }
     });
 }
-main("AltcoinGordon");
+main("Ashutosh0w0");
